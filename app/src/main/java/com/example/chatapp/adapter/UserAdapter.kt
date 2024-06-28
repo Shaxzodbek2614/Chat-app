@@ -8,11 +8,14 @@ import com.example.chatapp.databinding.ItemRvBinding
 import com.example.chatapp.models.User
 import com.squareup.picasso.Picasso
 
-class UserAdapter(private val list: ArrayList<User>): RecyclerView.Adapter<UserAdapter.Vh>() {
+class UserAdapter(val rvAction: RvAction,private val list: ArrayList<User>): RecyclerView.Adapter<UserAdapter.Vh>() {
     inner class Vh(val itemRvBinding: ItemRvBinding):ViewHolder(itemRvBinding.root){
         fun onBind(user: User){
             itemRvBinding.name.text = user.name
             Picasso.get().load(user.photoUrl).into(itemRvBinding.image)
+            itemRvBinding.root.setOnClickListener {
+                rvAction.itemClick(user)
+            }
         }
     }
 
@@ -26,5 +29,8 @@ class UserAdapter(private val list: ArrayList<User>): RecyclerView.Adapter<UserA
 
     override fun onBindViewHolder(holder: Vh, position: Int) {
         holder.onBind(list[position])
+    }
+    interface RvAction{
+        fun itemClick(user: User)
     }
 }
