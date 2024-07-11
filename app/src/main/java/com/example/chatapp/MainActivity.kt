@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         firebaseDatabase = FirebaseDatabase.getInstance()
         reference = firebaseDatabase.getReference("users")
+
         auth = FirebaseAuth.getInstance()
         if (auth.currentUser != null) {
             val intent  = Intent(this,UsersActivity::class.java)

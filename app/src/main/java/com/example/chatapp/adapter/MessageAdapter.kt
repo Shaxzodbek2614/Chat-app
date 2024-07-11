@@ -1,34 +1,73 @@
 package com.example.chatapp.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.databinding.FromItemBinding
 import com.example.chatapp.databinding.ToItemBinding
 import com.example.chatapp.models.Message
+import com.squareup.picasso.Picasso
 
-class MessageAdapter(val list: ArrayList<Message>, val currentUserUid: String):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter(val rvAction: RvAction,val list: ArrayList<Message>, val currentUserUid: String):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val TYPE_FROM = 1
     val TYPE_TO = 0
-    inner class ToVh(val itemRvBinding: ToItemBinding): RecyclerView.ViewHolder(itemRvBinding.root){
-        fun onBind(message: Message){
-            itemRvBinding.message.text = message.text
+
+    inner class ToVh(val itemRvBinding: ToItemBinding): RecyclerView.ViewHolder(itemRvBinding.root) {
+        fun onBind(message: Message) {
+            if (message.imageUri != null && message.text != "") {
+                itemRvBinding.card.visibility = View.VISIBLE
+                itemRvBinding.tvSms.visibility = View.VISIBLE
+                itemRvBinding.tvSms.text = message.text
+                Picasso.get().load(message.imageUri).into(itemRvBinding.image)
+            } else if (message.imageUri != null && message.text!!.isBlank()) {
+
+                itemRvBinding.card.visibility = View.VISIBLE
+                itemRvBinding.tvSms.visibility = View.GONE
+                Picasso.get().load(message.imageUri).into(itemRvBinding.image)
+            } else if (message.imageUri == null && message.text != "") {
+                itemRvBinding.card.visibility = View.GONE
+                itemRvBinding.tvSms.visibility = View.VISIBLE
+                itemRvBinding.tvSms.text = message.text
+                Picasso.get().load(message.imageUri).into(itemRvBinding.image)
+            }
+            itemRvBinding.card.setOnClickListener {
+                rvAction.imageClick(message)
+            }
         }
     }
 
     inner class FromVh(val itemRvBinding: FromItemBinding): RecyclerView.ViewHolder(itemRvBinding.root){
         fun onBind(message: Message){
-            itemRvBinding.message.text = message.text
+            if (message.imageUri != null && message.text != "") {
+                itemRvBinding.card.visibility = View.VISIBLE
+                itemRvBinding.tvSms.visibility = View.VISIBLE
+                itemRvBinding.tvSms.text = message.text
+                Picasso.get().load(message.imageUri).into(itemRvBinding.image)
+            }else if (message.imageUri != null && message.text!!.isBlank()){
+                itemRvBinding.card.visibility = View.VISIBLE
+                itemRvBinding.tvSms.visibility = View.GONE
+                Picasso.get().load(message.imageUri).into(itemRvBinding.image)
+            } else if (message.imageUri == null && message.text != ""){
+                itemRvBinding.card.visibility = View.GONE
+                itemRvBinding.tvSms.visibility = View.VISIBLE
+                itemRvBinding.tvSms.text = message.text
+                Picasso.get().load(message.imageUri).into(itemRvBinding.image)
+            }
+            itemRvBinding.card.setOnClickListener {
+                rvAction.imageClick(message)
+            }
         }
     }
 
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-       if (viewType==0){
-           return ToVh(ToItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
-       }else{
-           return FromVh(FromItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
-       }
+        return if (viewType==0){
+            ToVh(ToItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
+        }else{
+            FromVh(FromItemBinding.inflate(LayoutInflater.from(parent.context),parent,false))
+        }
     }
 
 
@@ -44,10 +83,13 @@ class MessageAdapter(val list: ArrayList<Message>, val currentUserUid: String):R
         }
     }
     override fun getItemViewType(position: Int): Int {
-        if (list[position].fromUserUid == currentUserUid) {
-            return TYPE_FROM
+        return if (list[position].fromUserUid == currentUserUid) {
+            TYPE_FROM
         } else {
-            return TYPE_TO
+            TYPE_TO
         }
+    }
+    interface RvAction{
+        fun imageClick(message: Message)
     }
 }
